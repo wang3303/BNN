@@ -24,23 +24,23 @@ def neural_network(x, W_0, W_1, b_0, b_1):
 def main():
 	ed.set_seed(42)
 
-	N = 50  # number of data ponts
+	N = 10  # number of data ponts
 	D = 1   # number of features
 	
 	x_train, y_train = build_toy_dataset(N)
 	
 	# build weights
-	# W_0 = Normal(mu=tf.zeros([D, 2]), sigma=tf.ones([D, 2]))
-	# W_1 = Normal(mu=tf.zeros([2, 1]), sigma=tf.ones([2, 1]))
-	# b_0 = Normal(mu=tf.zeros(2), sigma=tf.ones(2))
-	# b_1 = Normal(mu=tf.zeros(1), sigma=tf.ones(1))
+	W_0 = Normal(mu=tf.zeros([D, 2]), sigma=tf.ones([D, 2]))
+	W_1 = Normal(mu=tf.zeros([2, 1]), sigma=tf.ones([2, 1]))
+	b_0 = Normal(mu=tf.zeros(2), sigma=tf.ones(2))
+	b_1 = Normal(mu=tf.zeros(1), sigma=tf.ones(1))
 	
 	
-	# x = x_train
-	# y = Normal(mu=neural_network(x, W_0, W_1, b_0, b_1),
-			   # sigma=0.1 * tf.ones(N))							
+	x = x_train
+	y = Normal(mu=neural_network(x, W_0, W_1, b_0, b_1),
+			   sigma=0.1 * tf.ones(N))							
 	
-	# x_train, y_train = build_toy_dataset(N)
+	x_train, y_train = build_toy_dataset(N)
 	
 	
 	qW_0 = Normal(mu=tf.Variable(tf.random_normal([D, 2])),
@@ -73,10 +73,10 @@ def main():
 	# ax.legend()
 	# plt.show()
 	
-	#  run variational inference with the Kullback-Leibler divergence in order to infer the model’s latent variables
+	#  Kullback-Leibler divergence
 	inference = ed.KLqp({W_0: qW_0, b_0: qb_0,
                      W_1: qW_1, b_1: qb_1}, data={y: y_train})
-	inference.run(n_iter=500, n_samples=5)
+	inference.run(n_iter=1000, n_samples=5)
 	
 	outputs = mus.eval()
 
@@ -84,12 +84,12 @@ def main():
 	ax = fig.add_subplot(111)
 	ax.set_title("Iteration: 1000")
 	ax.plot(x_train, y_train, 'ks', alpha=0.5, label='(x, y)')
-	ax.plot(inputs, outputs[0].T, 'r', lw=2, alpha=0.5, label='posterior draws')
-	ax.plot(inputs, outputs[1:].T, 'r', lw=2, alpha=0.5)
+	ax.plot(inputs, outputs.T, 'r', lw=2, alpha=0.5, label='posterior draws')
+	#ax.plot(inputs, outputs[1:].T, 'r', lw=2, alpha=0.5)
 	ax.set_xlim([-5, 5])
 	ax.set_ylim([-2, 2])
 	ax.legend()
 	plt.show()	
 	
-if __name__ = "__main__":
+if __name__ == "__main__":
 	main()
